@@ -1,0 +1,16 @@
+..\..\output\gear_motor.o: ..\..\User\motor\gear_motor.c
+..\..\output\gear_motor.o: ..\..\User\motor\gear_motor.h
+..\..\output\gear_motor.o: ..\..\Libraries\CMSIS\stm32f10x.h
+..\..\output\gear_motor.o: ..\..\Libraries\CMSIS\core_cm3.h
+..\..\output\gear_motor.o: E:\keil5\ARM\ARMCC\Bin\..\include\stdint.h
+..\..\output\gear_motor.o: ..\..\Libraries\CMSIS\system_stm32f10x.h
+..\..\output\gear_motor.o: ..\..\User\stm32f10x_conf.h
+..\..\output\gear_motor.o: ..\..\Libraries\FWlib\inc\stm32f10x_adc.h
+..\..\output\gear_motor.o: ..\..\Libraries\CMSIS\stm32f10x.h
+..\..\output\gear_motor.o: ..\..\Libraries\FWlib\inc\stm32f10x_can.h
+..\..\output\gear_motor.o: ..\..\Libraries\FWlib\inc\stm32f10x_dma.h
+..\..\output\gear_motor.o: ..\..\Libraries\FWlib\inc\stm32f10x_gpio.h
+..\..\output\gear_motor.o: ..\..\Libraries\FWlib\inc\stm32f10x_rcc.h
+..\..\output\gear_motor.o: ..\..\Libraries\FWlib\inc\stm32f10x_tim.h
+..\..\output\gear_motor.o: ..\..\Libraries\FWlib\inc\stm32f10x_usart.h
+..\..\output\gear_motor.o: ..\..\Libraries\FWlib\inc\misc.h

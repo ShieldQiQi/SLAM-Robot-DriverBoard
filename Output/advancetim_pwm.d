@@ -1,0 +1,16 @@
+..\..\output\advancetim_pwm.o: ..\..\User\AdvanceTim\AdvanceTim_PWM.c
+..\..\output\advancetim_pwm.o: ..\..\User\AdvanceTim\AdvanceTim_PWM.h
+..\..\output\advancetim_pwm.o: ..\..\Libraries\CMSIS\stm32f10x.h
+..\..\output\advancetim_pwm.o: ..\..\Libraries\CMSIS\core_cm3.h
+..\..\output\advancetim_pwm.o: E:\keil5\ARM\ARMCC\Bin\..\include\stdint.h
+..\..\output\advancetim_pwm.o: ..\..\Libraries\CMSIS\system_stm32f10x.h
+..\..\output\advancetim_pwm.o: ..\..\User\stm32f10x_conf.h
+..\..\output\advancetim_pwm.o: ..\..\Libraries\FWlib\inc\stm32f10x_adc.h
+..\..\output\advancetim_pwm.o: ..\..\Libraries\CMSIS\stm32f10x.h
+..\..\output\advancetim_pwm.o: ..\..\Libraries\FWlib\inc\stm32f10x_can.h
+..\..\output\advancetim_pwm.o: ..\..\Libraries\FWlib\inc\stm32f10x_dma.h
+..\..\output\advancetim_pwm.o: ..\..\Libraries\FWlib\inc\stm32f10x_gpio.h
+..\..\output\advancetim_pwm.o: ..\..\Libraries\FWlib\inc\stm32f10x_rcc.h
+..\..\output\advancetim_pwm.o: ..\..\Libraries\FWlib\inc\stm32f10x_tim.h
+..\..\output\advancetim_pwm.o: ..\..\Libraries\FWlib\inc\stm32f10x_usart.h
+..\..\output\advancetim_pwm.o: ..\..\Libraries\FWlib\inc\misc.h
