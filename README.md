@@ -4,7 +4,7 @@
 [![Platform](https://img.shields.io/badge/stm32-f103vet6-red)](<>)
 [![Status](https://img.shields.io/badge/Staus-Processing-blue.svg)](<>)
 </br></br>[上层ROS程序源码]
-https://github.com/ShieldQiQi/SLAM-Robot-DriverBoard
+https://github.com/ShieldQiQi/TX2_StereoSLAM.git
 
 
 </br>
