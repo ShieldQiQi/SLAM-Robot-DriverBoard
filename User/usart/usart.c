@@ -37,11 +37,11 @@ void USART3_Config(void)
 	USART_InitStructure.USART_Parity = USART_Parity_No ;
 	USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
 	USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
-	USART_Init(RasberryPi_USART3, &USART_InitStructure);
+	USART_Init(TX2_USART3, &USART_InitStructure);
 	
-	USART_ITConfig(RasberryPi_USART3, USART_IT_RXNE, ENABLE);	
+	USART_ITConfig(TX2_USART3, USART_IT_RXNE, ENABLE);	
 	
-	USART_Cmd(RasberryPi_USART3, ENABLE);		
+	USART_Cmd(TX2_USART3, ENABLE);		
 
   // 清除发送完成标志
 	//USART_ClearFlag(USART1, USART_FLAG_TC);     
@@ -87,9 +87,9 @@ void Usart_SendHalfWord( USART_TypeDef * pUSARTx, uint16_t ch)
 ///重定向c库函数printf到串口，重定向后可使用printf函数
 int fputc(int ch, FILE *f)
 {
-	USART_SendData(RasberryPi_USART3, (uint8_t) ch);
+	USART_SendData(TX2_USART3, (uint8_t) ch);
 	
-	while (USART_GetFlagStatus(RasberryPi_USART3, USART_FLAG_TXE) == RESET);		
+	while (USART_GetFlagStatus(TX2_USART3, USART_FLAG_TXE) == RESET);		
 
 	return (ch);
 }
@@ -97,9 +97,9 @@ int fputc(int ch, FILE *f)
 ///重定向c库函数scanf到串口，重写向后可使用scanf、getchar等函数
 int fgetc(FILE *f)
 {
-		while (USART_GetFlagStatus(RasberryPi_USART3, USART_FLAG_RXNE) == RESET);
+		while (USART_GetFlagStatus(TX2_USART3, USART_FLAG_RXNE) == RESET);
 
-		return (int)USART_ReceiveData(RasberryPi_USART3);
+		return (int)USART_ReceiveData(TX2_USART3);
 }
 
 /************************END OF FILE********************/

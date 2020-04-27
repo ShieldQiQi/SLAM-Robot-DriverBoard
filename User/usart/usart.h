@@ -16,7 +16,7 @@
 #define Read_Ena			     digitalLo(RS485Ctrl_GPIO_PORT,GPIO_Pin_12)
 
 // ´®¿Ú3-USART3
-#define  RasberryPi_USART3              USART3
+#define  TX2_USART3                     USART3
 #define  DEBUG_USART_CLK                RCC_APB1Periph_USART3
 #define  DEBUG_USART_APBxClkCmd         RCC_APB1PeriphClockCmd
 #define  DEBUG_USART_BAUDRATE           115200

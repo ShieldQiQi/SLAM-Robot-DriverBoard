@@ -611,11 +611,6 @@
               <FilePath>..\..\User\Msg_queue\msg_queue.c</FilePath>
             </File>
             <File>
-              <FileName>control.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\User\pid\control.c</FilePath>
-            </File>
-            <File>
               <FileName>gear_motor.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\User\motor\gear_motor.c</FilePath>

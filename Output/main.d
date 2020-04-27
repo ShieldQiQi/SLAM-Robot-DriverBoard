@@ -25,3 +25,4 @@
 ..\..\output\main.o: ..\..\User\Msg_queue\msg_queue.h
 ..\..\output\main.o: E:\keil5\ARM\ARMCC\Bin\..\include\stdlib.h
 ..\..\output\main.o: ..\..\User\motor\gear_motor.h
+..\..\output\main.o: ..\..\User\Encoder\Tim_Encoder.h

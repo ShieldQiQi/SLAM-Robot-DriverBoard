@@ -27,3 +27,4 @@
 ..\..\output\stm32f10x_it.o: E:\keil5\ARM\ARMCC\Bin\..\include\stdlib.h
 ..\..\output\stm32f10x_it.o: ..\..\User\pid\control.h
 ..\..\output\stm32f10x_it.o: ..\..\User\motor\gear_motor.h
+..\..\output\stm32f10x_it.o: ..\..\User\Encoder\Tim_Encoder.h

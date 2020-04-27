@@ -77,6 +77,11 @@ static void ADVANCE_TIM_Mode_Config(void)
 
 void Set_Speed(uint8_t channel,float speed)
 {
+	if(speed < 0)
+		speed = 0;
+	if(speed > 20000)
+		speed = 20000;
+
 	switch(channel)
 	{
 		case 1:
@@ -92,18 +97,30 @@ void Set_Speed(uint8_t channel,float speed)
 			TIM_SetCompare4(TIM8, (uint16_t)speed);
 			break;
 		case 5:
+			TIM_SetCompare1(TIM8, (uint16_t)speed);
+			TIM_SetCompare3(TIM8, (uint16_t)speed);
 			TIM_SetCompare1(TIM1, (uint16_t)speed);
 			break;
 		case 6:
+			TIM_SetCompare2(TIM8, (uint16_t)speed);
+			TIM_SetCompare4(TIM8, (uint16_t)speed);
 			TIM_SetCompare4(TIM1, (uint16_t)speed);
 			break;		
 	}
+
 }
 
 void ADVANCE_TIM_Init(void)
 {
 	ADVANCE_TIM_GPIO_Config();
-	ADVANCE_TIM_Mode_Config();		
+	ADVANCE_TIM_Mode_Config();	
+
+	Set_Speed(1,0);
+	Set_Speed(2,0);
+	Set_Speed(3,0);
+	Set_Speed(4,0);
+	Set_Speed(5,0);
+	Set_Speed(6,0);	
 }
 
 /*********************************************END OF FILE**********************/

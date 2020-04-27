@@ -7,7 +7,7 @@ Date:2019-12-19
 #include "usart.h"
 #include "blue_tooth.h"
 
-LinkQueue thetaArray_Queue;
+LinkQueue speedArray_Queue;
 
 /*构造队列*/
 uint8_t InitQueue(LinkQueue *Q)
@@ -71,14 +71,14 @@ uint8_t QueueLength(LinkQueue Q)
 }
 
 /*进队列*/
-uint8_t Push(LinkQueue *Q,uint16_t theta[6])
+uint8_t Push(LinkQueue *Q,uint8_t data[15])
 { 
 	int i;
 	QueuePtr p=(QueuePtr)malloc(sizeof(QNode));
 	if(!p)
 		return 0;
-	for(i=0;i<6;i++)
-		p->theta[i] = theta[i];
+	for(i=0;i<15;i++)
+		p->data[i] = data[i];
 	p->next=NULL;
 	Q->rear->next=p;
 	Q->rear=p;
@@ -114,7 +114,7 @@ uint8_t QueueTraverse(LinkQueue Q)
 uint8_t Init_usartMsg_Queue(void)
 {
 	//初始化队列
-	if(!(InitQueue(&thetaArray_Queue)))
+	if(!(InitQueue(&speedArray_Queue)))
 		return 0;
 	return 1;
 }

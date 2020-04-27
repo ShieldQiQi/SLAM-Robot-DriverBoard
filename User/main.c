@@ -15,6 +15,7 @@
 #include "beep.h"
 #include "msg_queue.h"
 #include "gear_motor.h"
+#include "Tim_Encoder.h"
 
 int main(void)
 {	
@@ -27,18 +28,9 @@ int main(void)
 	ADCx_Init();
 	BEEP_Config();
   NVIC_Configuration();
-	
+	TIM_Encoder();
 	Init_usartMsg_Queue();
-	
-	Set_Speed(1,10000);
-	Set_Speed(2,10000);
-	Set_Speed(3,10000);
-	Set_Speed(4,10000);
-	Set_Speed(5,10000);
-	Set_Speed(6,10000);
-	
-	REV_L;
-	FWD_R;
+
 	Write_Ena;
 	while(1)
 	{
