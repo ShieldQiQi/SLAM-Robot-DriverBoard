@@ -32,7 +32,7 @@ uint8_t     time1 = 0;
 uint8_t     time2 = 0;
 uint8_t			count = 0;		
 uint8_t			receiveData = 0;
-uint8_t		  msgBuffer[17] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+uint8_t		  msgBuffer[3] = {0,0,0};
 extern 			LinkQueue speedArray_Queue;
 
 uint16_t		Count_br = 0;
@@ -94,39 +94,32 @@ void  BASIC_TIM_IRQHandler (void)
 			ADC_ConvertedValueLocal[4] =(float) ADC_ConvertedValue[4]/4096*3.3;
 			ADC_ConvertedValueLocal[5] =(float) ADC_ConvertedValue[5]/4096*3.3;
 			
-			printf("Encoder:%f  %f Target:%f  %f\n",encoder_blv,encoder_brv,targetSpeed_L,targetSpeed_R);
+//			printf("Encoder:%f  %f Target:%f  %f\n",encoder_blv,encoder_brv,targetSpeed_L,targetSpeed_R);
 			 	
 		}
 		
-		if(time0 % 10 == 0 && Ctrl_Mode == 0){
-			if(time2 < 100){
-				Set_Speed(1,msgBuffer[7]/255.0*20000);
-				Set_Speed(2,msgBuffer[8]/255.0*20000);
-				Set_Speed(3,msgBuffer[9]/255.0*20000);
-				Set_Speed(4,msgBuffer[10]/255.0*20000);
-				Set_Speed(5,msgBuffer[11]/255.0*20000);
-				Set_Speed(6,msgBuffer[12]/255.0*20000); 
-				
-				if(msgBuffer[14] == 0){
+		if(time0 % 5 == 0 && Ctrl_Mode == 0){
+			if(time2 < 255){
+				if(msgBuffer[1] <= 127 && msgBuffer[2] <= 127){
 					FWD_R;
 					FWD_L;
+					Set_TargetSpeed(msgBuffer[1]/127.0,msgBuffer[2]/127.0);
 					car_Statu = 0;
-				}else if(msgBuffer[14] == 1){
-					REV_R;
-					REV_L;
-					car_Statu = 1;
-				}else if(msgBuffer[14] == 2){
+				}else if(msgBuffer[1] > 127 && msgBuffer[2] <= 127){
 					FWD_R;
 					REV_L;
-					car_Statu = 2;
-				}else if(msgBuffer[14] == 3){
+					Set_TargetSpeed((255-msgBuffer[1])/127.0,msgBuffer[2]/127.0);
+					car_Statu = 1;
+				}else if(msgBuffer[1] <= 127 && msgBuffer[2] > 127){
 					REV_R;
 					FWD_L;
+					Set_TargetSpeed(msgBuffer[1]/127.0,(255-msgBuffer[2])/127.0);
+					car_Statu = 2;
+				}else{
+					REV_R;
+					REV_R;
+					Set_TargetSpeed((255-msgBuffer[1])/127.0,(255-msgBuffer[2])/127.0);
 					car_Statu = 3;
-				}else if(msgBuffer[14] == 4){
-					FAST_STOP_L;
-					FAST_STOP_R;
-					car_Statu = 4;
 				}
 			}else{
 				FAST_STOP_L;
@@ -151,7 +144,7 @@ void  BASIC_TIM_IRQHandler (void)
 接收TX2 RS485消息
 -------------------------------------------------------------------------------------------------------------*/
 
-void RasberryPi_USART_IRQHandler(void) 
+void TX2_USART_IRQHandler(void) 
 {
  
 	if(USART_GetITStatus(TX2_USART3,USART_IT_RXNE)!=RESET)
@@ -159,12 +152,12 @@ void RasberryPi_USART_IRQHandler(void)
 		receiveData = USART_ReceiveData(TX2_USART3);
 		LED2_TOGGLE;
 		
-		if(receiveData == 0x11 || isTrueDataFlag != 0)
+		if(receiveData == 0xff || isTrueDataFlag != 0)
 		{
 			//接收报文内容
 			msgBuffer[isTrueDataFlag] = receiveData;
 			isTrueDataFlag++;
-			if(isTrueDataFlag == 17){
+			if(isTrueDataFlag == 3){
 				isTrueDataFlag = 0;	
 			}
 		}

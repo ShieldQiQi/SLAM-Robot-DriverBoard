@@ -30,7 +30,7 @@ float PID_L (float Encoder,float Target)
 	static float Bias,speed_bias,Integral_bias,Last_Bias;
 	Bias=Target-Encoder;   
 	Integral_bias+=Bias;	  
-	speed_bias=Position_KP*Bias+Position_KI*Integral_bias+Position_KD*(Bias-Last_Bias);
+	speed_bias=KP*Bias+KI*Integral_bias+KD*(Bias-Last_Bias);
 	Last_Bias=Bias;         
 	return speed_bias; 
 }
@@ -40,7 +40,7 @@ float PID_R (float Encoder,float Target)
 	static float Bias,speed_bias,Integral_bias,Last_Bias;
 	Bias=Target-Encoder;   
 	Integral_bias+=Bias;	  
-	speed_bias=Position_KP*Bias+Position_KI*Integral_bias+Position_KD*(Bias-Last_Bias);
+	speed_bias=KP*Bias+KI*Integral_bias+KD*(Bias-Last_Bias);
 	Last_Bias=Bias;         
 	return speed_bias; 
 }

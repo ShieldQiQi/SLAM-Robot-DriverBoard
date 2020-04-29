@@ -31,7 +31,7 @@
 #define  DEBUG_USART_RX_GPIO_PIN        GPIO_Pin_11
 
 #define  DEBUG_USART_IRQ                USART3_IRQn
-#define  RasberryPi_USART_IRQHandler    USART3_IRQHandler
+#define  TX2_USART_IRQHandler   			  USART3_IRQHandler
 
 
 void USART3_Config(void);

@@ -38,9 +38,9 @@
 void GearMotor_Config(void);
 
 												
-#define Position_KP 6
-#define Position_KI 0
-#define Position_KD 0
+#define KP 6
+#define KI 0
+#define KD 0
 												
 float PID_L (float Encoder,float Target);
 float PID_R (float Encoder,float Target);

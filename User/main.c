@@ -31,7 +31,7 @@ int main(void)
 	TIM_Encoder();
 	Init_usartMsg_Queue();
 
-	Write_Ena;
+	Read_Ena;
 	while(1)
 	{
 		
