@@ -19,6 +19,8 @@
 #include "Tim_Encoder.h"
 
 uint8_t     car_Statu = 4;
+uint8_t     car_StatuLast = 4;
+uint8_t     car_StatuChangeCount =0;
 uint8_t     Ctrl_Mode = 0;
 uint8_t     i = 0;
 int         j = 0; 
@@ -43,6 +45,10 @@ float				brv[5] = {0,0,0,0,0};
 float				blv[5] = {0,0,0,0,0};
 extern			float targetSpeed_L;
 extern			float targetSpeed_R;
+float				targetSpeed_R_smooth = 0;
+float				targetSpeed_L_smooth = 0;
+float 			targetSpeed_R_buffer[50] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+float 			targetSpeed_L_buffer[50] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
 extern __IO uint16_t 		ADC_ConvertedValue[NOFCHANEL]; 	 
 float 									ADC_ConvertedValueLocal[NOFCHANEL]; 
@@ -55,7 +61,40 @@ float 									ADC_ConvertedValueLocal[NOFCHANEL];
 void  BASIC_TIM_IRQHandler (void)
 {
 	if ( TIM_GetITStatus( BASIC_TIM, TIM_IT_Update) != RESET ) 
-	{	
+	{
+
+		if(car_StatuLast != car_Statu)
+		{
+			FAST_STOP_L;
+			FAST_STOP_R;
+			car_StatuChangeCount++;
+		}
+		if(car_StatuChangeCount == 20)
+		{
+			car_StatuLast = car_Statu;
+			switch(car_StatuLast)
+			{
+				case 0:
+					FWD_R;
+					FWD_L;
+					break;
+				case 1:
+					FWD_R;
+					REV_L;
+					break;
+				case 2:
+					REV_R;
+					FWD_L;
+					break;
+				case 3:
+					REV_R;
+					REV_L;
+					break;
+				case 4:
+					break;
+			}
+			car_StatuChangeCount = 0;
+		}
 		
 		// read the rotary encoders
 		if(time1 % 2 == 0)
@@ -76,9 +115,31 @@ void  BASIC_TIM_IRQHandler (void)
 			encoder_brv=0.4*(0.9*brv[0]+0.7*brv[1]+0.5*brv[2]+0.3*brv[3]+0.1*brv[4]);
 			encoder_blv = encoder_blv>0?encoder_blv:-encoder_blv;
 			encoder_brv = encoder_brv>0?encoder_brv:-encoder_brv;
-					
-			Set_Speed(5,10000*(targetSpeed_L + PID_L(encoder_blv,targetSpeed_L)));
-			Set_Speed(6,10000*(targetSpeed_R + PID_R(encoder_brv,targetSpeed_R)));
+			
+			if(car_StatuLast == car_Statu)
+			{
+				for(i=49;i>0;i--)
+				{
+					targetSpeed_L_buffer[i] = targetSpeed_L_buffer[i-1];
+					targetSpeed_R_buffer[i] = targetSpeed_R_buffer[i-1];
+				}
+				targetSpeed_L_buffer[0] = targetSpeed_L;
+				targetSpeed_R_buffer[0] = targetSpeed_R;
+				
+				targetSpeed_L_smooth = 0;
+				targetSpeed_R_smooth = 0;
+				for(i=0;i<50;i++)
+				{
+					targetSpeed_L_smooth +=  targetSpeed_L_buffer[i];
+					targetSpeed_R_smooth +=  targetSpeed_R_buffer[i];
+				}
+				targetSpeed_L_smooth /= 50;
+				targetSpeed_R_smooth /= 50;
+				
+				Set_Speed(5,10000*(targetSpeed_L_smooth + PID_L(encoder_blv,targetSpeed_L_smooth)));
+				Set_Speed(6,10000*(targetSpeed_R_smooth + PID_R(encoder_brv,targetSpeed_R_smooth)));
+			}
+			
 		}
 
 		
@@ -94,34 +155,27 @@ void  BASIC_TIM_IRQHandler (void)
 			ADC_ConvertedValueLocal[4] =(float) ADC_ConvertedValue[4]/4096*3.3;
 			ADC_ConvertedValueLocal[5] =(float) ADC_ConvertedValue[5]/4096*3.3;
 			
-//			printf("Encoder:%f  %f Target:%f  %f\n",encoder_blv,encoder_brv,targetSpeed_L,targetSpeed_R);
+			USART_SendData(Bluetooth_USART1,car_StatuLast);
 			 	
 		}
 		
-		if(time0 % 5 == 0 && Ctrl_Mode == 0){
+		if(/*time0 % 5 == 0 &&*/ Ctrl_Mode == 0){
 			if(time2 < 255){
 				if(msgBuffer[1] <= 127 && msgBuffer[2] <= 127){
-					FWD_R;
-					FWD_L;
 					Set_TargetSpeed(msgBuffer[1]/127.0,msgBuffer[2]/127.0);
 					car_Statu = 0;
 				}else if(msgBuffer[1] > 127 && msgBuffer[2] <= 127){
-					FWD_R;
-					REV_L;
 					Set_TargetSpeed((255-msgBuffer[1])/127.0,msgBuffer[2]/127.0);
 					car_Statu = 1;
 				}else if(msgBuffer[1] <= 127 && msgBuffer[2] > 127){
-					REV_R;
-					FWD_L;
 					Set_TargetSpeed(msgBuffer[1]/127.0,(255-msgBuffer[2])/127.0);
 					car_Statu = 2;
 				}else{
-					REV_R;
-					REV_R;
 					Set_TargetSpeed((255-msgBuffer[1])/127.0,(255-msgBuffer[2])/127.0);
 					car_Statu = 3;
 				}
 			}else{
+				Set_TargetSpeed(0,0);
 				FAST_STOP_L;
 				FAST_STOP_R;
 				car_Statu = 4;
@@ -177,60 +231,34 @@ void Bluetooth_USART1_IRQHandler(void)
 	{
 		ucTemp=USART_ReceiveData(Bluetooth_USART1);
 		if(ucTemp==48){
-//			Set_Speed(1,5000);
-//			Set_Speed(2,5000);
-//			Set_Speed(3,5000);
-//			Set_Speed(4,5000);
-//			Set_Speed(5,5000);
-//			Set_Speed(6,5000);
-			Set_TargetSpeed(0.5,0.5);
-			
-			FWD_R;
-			FWD_L;
+			Set_TargetSpeed(0.8,0.8);
+			car_Statu = 0;
 		}else if(ucTemp==49){
-//			Set_Speed(1,11000);
-//			Set_Speed(2,20000);
-//			Set_Speed(3,11000);
-//			Set_Speed(4,20000);
-//			Set_Speed(5,11000);
-//			Set_Speed(6,20000);
-			
 			Set_TargetSpeed(0.3,0.7);
-			
-			FWD_R;
-			REV_L;
+			car_Statu = 1;
 		}else if(ucTemp==50){
-//			Set_Speed(1,20000);
-//			Set_Speed(2,11000);
-//			Set_Speed(3,20000);
-//			Set_Speed(4,11000);
-//			Set_Speed(5,20000);
-//			Set_Speed(6,11000);
-			
 			Set_TargetSpeed(0.7,0.3);
-			
-			REV_R;
-			FWD_L;
+			car_Statu = 2;
 		}else if(ucTemp==51){
-//			Set_Speed(1,5000);
-//			Set_Speed(2,5000);
-//			Set_Speed(3,5000);
-//			Set_Speed(4,5000);
-//			Set_Speed(5,5000);
-//			Set_Speed(6,5000);
-			
-			Set_TargetSpeed(0.5,0.5);
-			
-			REV_R;
-			REV_L;
+			Set_TargetSpeed(0.8,0.8);
+			car_Statu = 3;
 		}else if(ucTemp==52){
-//			FAST_STOP_L;
-//			FAST_STOP_R;
 			Set_TargetSpeed(0,0);
+			FAST_STOP_L;
+			FAST_STOP_R;
+			car_Statu = 4;
 		}else if(ucTemp==53){
 			Ctrl_Mode = 0;
+			Set_TargetSpeed(0,0);
+			FAST_STOP_L;
+			FAST_STOP_R;
+			car_Statu = 4;
 		}else if(ucTemp==54){
 			Ctrl_Mode = 1;
+			Set_TargetSpeed(0,0);
+			FAST_STOP_L;
+			FAST_STOP_R;
+			car_Statu = 4;
 		}
 	}
 }
