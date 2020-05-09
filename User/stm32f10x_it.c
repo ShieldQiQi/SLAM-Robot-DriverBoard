@@ -62,7 +62,6 @@ void  BASIC_TIM_IRQHandler (void)
 {
 	if ( TIM_GetITStatus( BASIC_TIM, TIM_IT_Update) != RESET ) 
 	{
-
 		if(car_StatuLast != car_Statu)
 		{
 			FAST_STOP_L;
@@ -71,6 +70,14 @@ void  BASIC_TIM_IRQHandler (void)
 		}
 		if(car_StatuChangeCount == 20)
 		{
+			for(i=49;i>0;i--)
+			{
+				targetSpeed_L_buffer[i] = 0;
+				targetSpeed_R_buffer[i] = 0;
+			}
+			targetSpeed_L_buffer[0] = 0;
+			targetSpeed_R_buffer[0] = 0;
+			
 			car_StatuLast = car_Statu;
 			switch(car_StatuLast)
 			{
@@ -118,26 +125,32 @@ void  BASIC_TIM_IRQHandler (void)
 			
 			if(car_StatuLast == car_Statu)
 			{
-				for(i=49;i>0;i--)
+				if( 1 /*car_StatuLast == 0 || car_StatuLast == 3*/)
 				{
-					targetSpeed_L_buffer[i] = targetSpeed_L_buffer[i-1];
-					targetSpeed_R_buffer[i] = targetSpeed_R_buffer[i-1];
+					for(i=49;i>0;i--)
+					{
+						targetSpeed_L_buffer[i] = targetSpeed_L_buffer[i-1];
+						targetSpeed_R_buffer[i] = targetSpeed_R_buffer[i-1];
+					}
+					targetSpeed_L_buffer[0] = targetSpeed_L;
+					targetSpeed_R_buffer[0] = targetSpeed_R;
+					
+					targetSpeed_L_smooth = 0;
+					targetSpeed_R_smooth = 0;
+					for(i=0;i<50;i++)
+					{
+						targetSpeed_L_smooth +=  targetSpeed_L_buffer[i];
+						targetSpeed_R_smooth +=  targetSpeed_R_buffer[i];
+					}
+					targetSpeed_L_smooth /= 50;
+					targetSpeed_R_smooth /= 50;
+					
+					Set_Speed(5,10000*(targetSpeed_L_smooth + PID_L(encoder_blv,targetSpeed_L_smooth)));
+					Set_Speed(6,10000*(targetSpeed_R_smooth + PID_R(encoder_brv,targetSpeed_R_smooth)));
+				}else{
+					Set_Speed(5,10000*(targetSpeed_L + PID_L(encoder_blv,targetSpeed_L)));
+					Set_Speed(6,10000*(targetSpeed_R + PID_R(encoder_brv,targetSpeed_R)));	
 				}
-				targetSpeed_L_buffer[0] = targetSpeed_L;
-				targetSpeed_R_buffer[0] = targetSpeed_R;
-				
-				targetSpeed_L_smooth = 0;
-				targetSpeed_R_smooth = 0;
-				for(i=0;i<50;i++)
-				{
-					targetSpeed_L_smooth +=  targetSpeed_L_buffer[i];
-					targetSpeed_R_smooth +=  targetSpeed_R_buffer[i];
-				}
-				targetSpeed_L_smooth /= 50;
-				targetSpeed_R_smooth /= 50;
-				
-				Set_Speed(5,10000*(targetSpeed_L_smooth + PID_L(encoder_blv,targetSpeed_L_smooth)));
-				Set_Speed(6,10000*(targetSpeed_R_smooth + PID_R(encoder_brv,targetSpeed_R_smooth)));
 			}
 			
 		}
@@ -162,16 +175,16 @@ void  BASIC_TIM_IRQHandler (void)
 		if(/*time0 % 5 == 0 &&*/ Ctrl_Mode == 0){
 			if(time2 < 255){
 				if(msgBuffer[1] <= 127 && msgBuffer[2] <= 127){
-					Set_TargetSpeed(msgBuffer[1]/127.0,msgBuffer[2]/127.0);
+					Set_TargetSpeed(msgBuffer[1]/127.0*2,msgBuffer[2]/127.0*2);
 					car_Statu = 0;
 				}else if(msgBuffer[1] > 127 && msgBuffer[2] <= 127){
-					Set_TargetSpeed((255-msgBuffer[1])/127.0,msgBuffer[2]/127.0);
+					Set_TargetSpeed((255-msgBuffer[1])/127.0*2,msgBuffer[2]/127.0*2);
 					car_Statu = 1;
 				}else if(msgBuffer[1] <= 127 && msgBuffer[2] > 127){
-					Set_TargetSpeed(msgBuffer[1]/127.0,(255-msgBuffer[2])/127.0);
+					Set_TargetSpeed(msgBuffer[1]/127.0*2,(255-msgBuffer[2])/127.0*2);
 					car_Statu = 2;
 				}else{
-					Set_TargetSpeed((255-msgBuffer[1])/127.0,(255-msgBuffer[2])/127.0);
+					Set_TargetSpeed((255-msgBuffer[1])/127.0*2,(255-msgBuffer[2])/127.0*2);
 					car_Statu = 3;
 				}
 			}else{
@@ -231,16 +244,16 @@ void Bluetooth_USART1_IRQHandler(void)
 	{
 		ucTemp=USART_ReceiveData(Bluetooth_USART1);
 		if(ucTemp==48){
-			Set_TargetSpeed(0.8,0.8);
+			Set_TargetSpeed(0.20,0.20);
 			car_Statu = 0;
 		}else if(ucTemp==49){
-			Set_TargetSpeed(0.3,0.7);
+			Set_TargetSpeed(0.19,0.25);
 			car_Statu = 1;
 		}else if(ucTemp==50){
-			Set_TargetSpeed(0.7,0.3);
+			Set_TargetSpeed(0.30,0.25);
 			car_Statu = 2;
 		}else if(ucTemp==51){
-			Set_TargetSpeed(0.8,0.8);
+			Set_TargetSpeed(0.25,0.25);
 			car_Statu = 3;
 		}else if(ucTemp==52){
 			Set_TargetSpeed(0,0);
